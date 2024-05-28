@@ -1,1 +1,66 @@
-codigo del primer programa
+// 1. En C implemente las funciones basicas (+,-,*,/); utilice punteros (Ej. Multiplicacion en base a sumas, division en base a restas).
+
+#include <stdio.h>
+
+int suma(int *numero1, int *numero2)
+{
+rerurn *a + *b;
+}
+---------------------------------------------------------------
+int resta(int *numero1, int *numero2)
+{
+return *a - *b;
+}
+---------------------------------------------------------------
+int multiplicacion(int *numero1, *numero2)
+{
+int resultado=0;
+for(int i=0; i<*numero2; i++){
+resultado+=*a;
+}
+return resultado;
+}
+----------------------------------------------------------------
+int division(int *numero1, int *numero2){
+// comprobamos la divisioon por cero
+if(*numero2==0){
+printf("Error en la division, no se puede dividir por cero\n ");
+return 0;  // devolvemos un valor neutro si es que la division no es posible
+}
+
+int resultado=0;
+int valorTemporal= *numero1;
+
+// Realizar la division mediante restas sucesivas
+while(valorTemporal>=*numero2){
+valorTemporal-= *numero2;
+resultado++;
+}
+return resultado;   // devolvemos el valor del resultado
+}
+----------------------------------------------------------------
+
+int main(){
+int numero1=6;
+int numero2=4;
+
+int resultadoSuma=suma(&numero1,&numero2);
+printf("La suma de: %d + %d = %d\n", numero1, numero2, resultadoSuma);
+
+int resultadoResta=resta(&numero1, &numero2);
+printf("La resta de: %d - %d = %d\n", numero1, numero2, resultadoResta);
+
+int resultadoMultiplicacion=multiplicacion(&numero1, &numero2);
+printf("La multiplicacion de: %d * %d = %d\n", numero1, numero2, resultadoMultiplicacion);
+
+int resultadoDivision=division(&numero1, &numero2);
+// imprimimos el resulado de la division
+if(numero2!=0){
+printf("La division: %d / %d = %d\n", numero1, numero2, resultadoDivision);
+}
+
+return 0;
+}
+
+
+
