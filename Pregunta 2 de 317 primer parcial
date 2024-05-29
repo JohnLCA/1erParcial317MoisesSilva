@@ -1,1 +1,63 @@
-codigo de la segunda pregunta
+// 2. Lleve el anterior codigo en c++ lo que es la pregunta 1.
+
+#include <iostream> // Incluimos la biblioteca de entrada/salida en c++
+
+int suma(int *numero1, int *numero2)
+{
+rerurn *a + *b;
+}
+---------------------------------------------------------------
+int resta(int *numero1, int *numero2)
+{
+return *a - *b;
+}
+---------------------------------------------------------------
+int multiplicacion(int *numero1, *numero2)
+{
+int resultado=0;
+for(int i=0; i< *numero2; i++){
+resultado+=*a;
+}
+return resultado;
+}
+----------------------------------------------------------------
+int division(int *numero1, int *numero2){
+// comprobamos la divisioon por cero
+if(*numero2==0){
+ std::cout << "Error por la division por cero no esta permitida." << std::endl;
+return 0;  // devolvemos un valor neutro si es que la division no es posible
+}
+
+int resultado=0;
+int valorTemporal= *numero1;
+
+// Realizar la division mediante restas sucesivas
+while(valorTemporal>=*numero2){
+valorTemporal-= *numero2;
+resultado++;
+}
+return resultado;   // devolvemos el valor del resultado
+}
+----------------------------------------------------------------
+
+int main(){
+int numero1=6;
+int numero2=4;
+
+int resultadoSuma=suma(&numero1,&numero2);
+std::cout << "Suma :" << numero1 << " + " << numero2 << " = " << resultadoSuma << std::endl;
+
+int resultadoResta=resta(&numero1, &numero2);
+std::cout << "Resta: " << numero1 << " - " << numero2 << " = " << resultadoResta << std::endl;
+
+int resultadoMultiplicacion=multiplicacion(&numero1, &numero2);
+std::cout << "Multiplicacion: " << numero1 << " * " << numero2 << " = " << resultadoMultiplicacion << std::endl;
+
+int resultadoDivision=division(&numero1, &numero2);
+// imprimimos el resulado de la division
+if(numero2!=0){
+std::cout << "Division: " << numero1 << " / " << numero2 << " = " << resultadoDivision << std::endl; 
+}
+
+return 0;
+}
