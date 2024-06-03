@@ -1,1 +1,54 @@
+4. Realizar en OpenMP la multiplicacion de una matriz NxN, con un vector de dimension N
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+void matriz_vector_multiplicacion(double **V, double *x, double *y, int N){
+int a,b;
+
+#pragma omp parallel for private(b)
+for (a=0; a<N; a++){
+y[a]=0.0;
+for (b=0;b<N; b++){
+y[a]+=V[a][b] * x[b];
+}
+}
+}
+
+int main(){
+int N=5;
+// tamaño de variable de N del tamaño del vector y la matriz
+double **V=(double **)malloc(N * sizeof(double *));
+for (int i=0; i<N; i++){
+V[i]= (double *)malloc(N * sizeof(double));
+}
+double *a = (double *)malloc(N * sizeof(double));
+double *b = (double *)malloc(N * sizeof(double));
+
+// Inicializa la matriz y el vector
+for (int i=0; i<N; i++){
+// realizamos el llenado del vector
+a[i]=i+1; 
+for (int j=0; j<N; j++){
+V[i][j]=j+1; 
+// llenando matriz con valores similares al vector
+}
+}
+// Llamamos a la funcion de multiplicacion
+matriz_vector_multiplicacion(V,a,b,N);
+// Impresion del resultado 
+printf("Vector resultado:\n");
+for(int i=0;i<N; i++ ){
+printf("%d\n",b[i]);
+}
+// Ahora liberamos la memoria 
+for(int i=0; i<N; i++){
+free(V[i]);
+}
+free(V);
+free(a);
+free(b);
+
+return 0;
+}
