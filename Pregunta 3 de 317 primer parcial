@@ -1,1 +1,47 @@
-system.out.println("Hola Mundo");
+#include <stdio.h>
+#include <omp.h>
+
+//Funcion para multiplicar dos numeros utilizando sumas repetidas 
+int multiplicacion(int numero1, numero2){
+inr resultado=0;
+#pragma omp parallel for reduction(+:resultado)
+for(int i=0; i<b; i++){
+resultado+=a;
+}
+return resultado;
+}
+
+//Funcion para dividir dos numeros utilizando restas repetidas
+int division(int dividiendo, int divisor){
+int resultadoDivision=0;
+int dividiendo2=dividiendo;
+#pragma omp parallel 
+{
+while(dividiendo2>=divisor){
+#pragma omp critical{
+if(dividiendo2>=divisor){
+dividiendo2-=divisor;
+resultadoDivision++;
+}
+}
+}
+}
+return resultadoDivision;
+}
+
+// el programa principal
+
+int main(){
+int numero1=6, numero2=4;
+// llamando a la funcion de multiplicacion 
+int producto=multiplicacion(numero1, numero2);
+// llamando a la funcion division
+int dividiendo=division(producto, numero1);
+// deberia poder retornar el numero 2 
+printf("%d / %d = %d\n", producto , numero1, dividiendo);
+return 0;
+}
+
+
+
+
