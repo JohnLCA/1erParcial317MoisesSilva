@@ -1,1 +1,86 @@
+//5.	Realizar en MPI la multiplicación de una matriz NxN, con un vector de dimensión N.
 
+// veamos iniciamos con el programa
+
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char** argv){
+MPI_Init(&argc, &argv);
+
+int world_size;
+MPI_Comm_size(MPI_COMM_WORLD, &worl_size);
+
+int world_rank;
+MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+// Dimension de la matriz y el vector
+int N=4; 
+double matriz[N][N];
+double vector[N];
+double VectorResutado[N];
+if(world_rank==0){
+// Inicializar la matriz y el vector
+for(int i=0; i<N; i++){
+vector[i]=i+1;
+for( int j=0; j<N; j++){
+matriz[i][j]=i*N+j+1;
+}
+}
+}
+//Distribuimos el vetcor a todos los procesos
+MPI_Bcast(vector, N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+// Determinar el numero de filas que cada proceso va a manejar
+int rows_per_process = N/world_size;
+int extra_rows = N % world_size;
+// Cada proceso recibe su porcion de la matriz
+double local_matriz[rows_per_process + (world_rank < extra_rows ? 1 : 0)][N];
+double local_resultado[rows_per_process + (world_rank < extra_rows ? 1 : 0 )];
+//Definir desplazamiento y tamaños de filas
+int *sendcounts = NULL;
+int *displs = NULL;
+if(world_rank == 0){
+sendcounts = malloc(world_size * sizeof(int));
+displs = malloc(world_size *  sizeof(int));
+int sum = 0;
+for (int i=0; i< world_size; i++){
+sendcounts[i] = rows_per_process * N + (i < extra_rows ? N : 0);
+displs[i] = sum;
+sum += sendcounts[i];
+}
+}
+//Distribuir las filas de la matriz a todos los procesos
+MPI_Scatterv(&(matriz[0][0]), sendcounts, displs, MPI_DOUBLE, 
+&(local_matriz[0][0]), (rows_per_process + (world_rank < extra_rows ? 1 : 0)) * N, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+int local_rows = rows_per_process + (world_rank < extra_rows ? 1 : 0);
+for (int i=0; i<local_rows; i++){
+local_result[i] = 0.0;
+for (int j=0; j<N; j++){
+local_result[i] += local_matriz[i][j] * vector[j];
+}
+}
+//Definir desplazamientos para los resultados parciales
+if(world_rank == 0) {
+for(int i=0; i< world_size; i++){
+displs[i] = i * rows_per_process + (i< extra_rows ? i : extra_rows);
+sendcounts[I] = rows_per_process + (i< extra_rows ? 1 : 0);
+}
+}
+// Recibir los resultados parciales en el proceso raiz 
+MPI_Gatherv(local_result, local_rows, MPI_DOUBLE, result, sendcounts, displs, 
+MPI_DOUBLE, 0, MPI_COMM_WORLD);
+// Proceso raiz imprime el resultado
+if(world_rank == 0){
+printf("Resultado:\n");
+for(int i=0; i<N; i++){
+printf("%f\n", result[i]);
+}
+}
+// Liberar memoria 
+if(world_rank == 0 ){
+free(sendcounts);
+free(displs);
+}
+MPI_Finalize();
+return 0;
+}
