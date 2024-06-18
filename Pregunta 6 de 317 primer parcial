@@ -1,1 +1,69 @@
+// pregunta Nro 6 de 317 primer parcial
+
+// incluimos la importacion o llamadao de las librerias que usaremos asi como MPI 
+
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+// realizamos la función para generar un número aleatorio entre 0 y 1 
+double random_double() {
+    return (double)rand() / (double)RAND_MAX;
+}
+
+// aca vemos la función principal
+int main(int argc, char *argv[]) {
+    int num_procesos, rango, i, n_puntos, puntos_dentro_circulo = 0, total_dentro_circulo;
+    double x, y, estimacion_pi;
+    double inicio, fin, tiempo_total;
+
+    // Inicializamos la funcion  MPI
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procesos);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rango);
+
+    // vemos la construccion para los números aleatorios
+    srand(time(NULL) + rango);
+
+    //tendremos el número de puntos a generar por cada proceso (puede ser pasado como argumento)
+    if (argc != 2) {
+        if (rango == 0) {
+            printf("Uso: %s <número de puntos por proceso>\n", argv[0]);
+        }
+        MPI_Finalize();
+        return -1;
+    }
+    n_puntos = atoi(argv[1]);
+
+    // Iniciar el cronómetro
+    inicio = MPI_Wtime();
+
+    // ahora generar puntos y contar cuántos caen dentro del círculo
+    for (i = 0; i < n_puntos; i++) {
+        x = random_double();
+        y = random_double();
+        if (x * x + y * y <= 1.0) {
+            puntos_dentro_circulo++;
+        }
+    }
+
+    // tenemos que sumar los puntos dentro del círculo de todos los procesos
+    MPI_Reduce(&puntos_dentro_circulo, &total_dentro_circulo, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+    // Calcular la estimación de PI y el tiempo total
+    if (rango == 0) {
+        estimacion_pi = 4.0 * (double)total_dentro_circulo / (n_puntos * num_procesos);
+        fin = MPI_Wtime();
+        tiempo_total = fin - inicio;
+
+        printf("Estimación de PI: %f\n", estimacion_pi);
+        printf("Tiempo total: %f segundos\n", tiempo_total);
+    }
+
+    // Finalizar MPI
+    MPI_Finalize();
+    return 0;
+}
 
