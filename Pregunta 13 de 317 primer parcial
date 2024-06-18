@@ -1,1 +1,63 @@
+#pregunta NRO 13 de 317 primer parcial 
 
+#13.	Realice el cálculo de Fibonacci con Multiprocessing de al menos 1000 términos divididos por procesador de manera dinámica.
+
+# vemos la importacion de multiprocesing en pyton  
+
+import multiprocessing as mp
+
+# tenemos la función para calcular el término de Fibonacci
+def calcular_fibonacci(n):
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+# la función que ejecuta cada proceso para calcular un subconjunto de términos de Fibonacci
+def trabajador(tareas, resultados):
+    while True:
+        indice = tareas.get()
+        if indice is None:  # Señal para terminar
+            break
+        resultado = calcular_fibonacci(indice)
+        resultados.put((indice, resultado))
+
+# arhoa ael programa principal
+def main(num_terminos=1000, num_procesos=4):
+    # Crear colas de tareas y resultados
+    tareas = mp.Queue()
+    resultados = mp.Queue()
+
+    # creamos  y lanzamos los procesos
+    procesos = []
+    for _ in range(num_procesos):
+        p = mp.Process(target=trabajador, args=(tareas, resultados))
+        p.start()
+        procesos.append(p)
+
+    # Poner tareas en la cola
+    for i in range(num_terminos):
+        tareas.put(i)
+
+    # Ponemos señales de terminación para cada proceso
+    for _ in range(num_procesos):
+        tareas.put(None)
+
+    # entonces recolectamos resultados
+    fib_resultados = [None] * num_terminos
+    for _ in range(num_terminos):
+        indice, resultado = resultados.get()
+        fib_resultados[indice] = resultado
+
+    # esperamos  a que todos los procesos terminen
+    for p in procesos:
+        p.join()
+
+    # imprimimos los  resultados
+    for i, valor in enumerate(fib_resultados):
+        print(f"Término {i} de Fibonacci es {valor}")
+
+if __name__ == "__main__":
+    main()
