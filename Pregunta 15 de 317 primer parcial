@@ -1,1 +1,30 @@
+// pregunta Nro 15 de 317 primer paecial 
+
+// 15.	Despliegue “hola mundo” en la librería de su gusto.
+
+
+#include <mpi.h>   // Cabecera principal de MPI
+#include <stdio.h> // Cabecera estándar de entrada y salida
+
+int main(int argc, char** argv) {
+    int mi_rank;         // Rango (ID) del proceso actual
+    int num_procesos;    // Número total de procesos
+
+    // Inicialización del entorno MPI
+    MPI_Init(&argc, &argv);
+
+    // Obtener el rango (ID) del proceso actual
+    MPI_Comm_rank(MPI_COMM_WORLD, &mi_rank);
+
+    // Obtener el número total de procesos en el comunicador MPI_COMM_WORLD
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procesos);
+
+    // Imprimir "Hola Mundo" desde cada proceso
+    printf("Hola Mundo desde el procesador %d de %d\n", mi_rank, num_procesos);
+
+    // Finalizar el entorno MPI
+    MPI_Finalize();
+
+    return 0;
+}
 
