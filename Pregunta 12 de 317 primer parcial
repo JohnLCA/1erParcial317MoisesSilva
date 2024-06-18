@@ -1,1 +1,54 @@
+// pregunta Nro 12 primer parcial 
+// Realice el cálculo de Fibonacci con MPI  mediante un procesador MASTER que solicite cada termino a los procesadores SLAVE
+// hacemos la importacion de la libreria MPI
+
+#include <mpi.h>
+#include <stdio.h>
+
+// realimzamos el metodo para calcular el fobonaci
+int calcular_fibonacci(int n) {
+    if (n <= 1) return n;
+    int a = 0, b = 1, c;
+    for (int i = 2; i <= n; i++) {
+        c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}
+
+
+// tenemos nuesto programa principal
+
+int main(int argc, char* argv[]) {
+    int num_procesos, mi_id, num_terminos = 10;
+
+// iniciacmos con el MPI
+
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procesos);
+    MPI_Comm_rank(MPI_COMM_WORLD, &mi_id);
+
+    if (mi_id == 0) { // Procesador MASTER
+        printf("Calculando los primeros %d términos de Fibonacci usando %d procesadores.\n", num_terminos, num_procesos);
+
+        int termino;
+        for (int i = 1; i < num_terminos; i++) {
+            int destino = (i % (num_procesos - 1)) + 1; // Distribuir entre los SLAVEs
+            MPI_Send(&i, 1, MPI_INT, destino, 0, MPI_COMM_WORLD);
+            MPI_Recv(&termino, 1, MPI_INT, destino, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            printf("Término %d de Fibonacci es %d\n", i, termino);
+        }
+    } else { // Procesadores SLAVE
+        int indice, resultado;
+        for (int i = mi_id; i < num_terminos; i += (num_procesos - 1)) {
+            MPI_Recv(&indice, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            resultado = calcular_fibonacci(indice);
+            MPI_Send(&resultado, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+        }
+    }
+// finalizamos el MPI
+    MPI_Finalize();
+    return 0;
+}
 
