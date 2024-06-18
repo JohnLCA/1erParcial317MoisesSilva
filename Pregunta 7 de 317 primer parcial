@@ -1,1 +1,52 @@
+#pregunta Nro 7 de 317 primero parcial
+
+# realizamos el llamado de las librerias para resolver el calculo 
+
+import multiprocessing
+import random
+import time
+
+# tenemos la función para generar un punto aleatorio y verificar si está dentro del círculo
+def punto_dentro_del_circulo(n_puntos):
+    puntos_dentro = 0
+    for _ in range(n_puntos):
+        x = random.random()
+        y = random.random()
+        if x**2 + y**2 <= 1.0:
+            puntos_dentro += 1
+    return puntos_dentro
+
+# ahora función principal para calcular PI usando multiprocesamiento
+def calcular_pi(n_puntos_por_proceso, n_procesos):
+    # Crear un pool de procesos
+    with multiprocessing.Pool(processes=n_procesos) as pool:
+        # Dividir los puntos entre los procesos
+        resultados = pool.map(punto_dentro_del_circulo, [n_puntos_por_proceso] * n_procesos)
+        
+    # Sumar los resultados de todos los procesos
+    total_dentro_del_circulo = sum(resultados)
+    # Calcular la estimación de PI
+    total_puntos = n_puntos_por_proceso * n_procesos
+    estimacion_pi = 4.0 * total_dentro_del_circulo / total_puntos
+    
+    return estimacion_pi
+
+# aca tenemos un punto de entrada del script
+if __name__ == "__main__":
+    n_puntos_por_proceso = int(input("Ingrese el número de puntos por proceso: "))
+    n_procesos = int(input("Ingrese el número de procesos: "))
+    
+    # iniciamos el cronómetro
+    inicio = time.time()
+    
+    # realizamos el calculo de PI
+    pi_estimada = calcular_pi(n_puntos_por_proceso, n_procesos)
+    
+    # detenemos el cronometro 
+    fin = time.time()
+    tiempo_total = fin - inicio
+    
+    # hacemos la muestra de los resultados
+    print(f"Estimación de PI: {pi_estimada}")
+    print(f"Tiempo total: {tiempo_total} segundos")
 
