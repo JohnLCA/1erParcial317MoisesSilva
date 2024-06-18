@@ -1,1 +1,49 @@
+//pregunta Nro 8 de 317 primer parcial 
+
+// realizamos la mportacion de las librerias correspondientes OPENMP 
+
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// vemos la función principal
+int main(int argc, char *argv[]) {
+    // Verificar el número de argumentos
+    if (argc != 3) {
+        printf("Uso: %s <Número de términos (N)> <Número de procesadores (M)>\n", argv[0]);
+        return -1;
+    }
+
+    // obtenemos el número de términos (N) y el número de procesadores (M) desde los argumentos
+    int N = atoi(argv[1]);
+    int M = atoi(argv[2]);
+
+    // creamos un array para almacenar la serie
+    int *serie = (int *)malloc(N * sizeof(int));
+    if (serie == NULL) {
+        printf("Error al asignar memoria para la serie\n");
+        return -1;
+    }
+
+    // tenemos que configurar el número de threads de OpenMP
+    omp_set_num_threads(M);
+
+    // generamos  la serie en paralelo
+    #pragma omp parallel for
+    for (int i = 0; i < N; i++) {
+        serie[i] = 2 * (i + 1);  // La serie es 2, 4, 6, 8, ...
+    }
+
+    // hacemos la impresionde la serie
+    printf("Serie generada: ");
+    for (int i = 0; i < N; i++) {
+        printf("%d ", serie[i]);
+    }
+    printf("\n");
+
+    // hacemos la liberacion de la memoria
+    free(serie);
+
+    return 0;
+}
 
