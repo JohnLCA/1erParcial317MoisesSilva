@@ -1,1 +1,32 @@
+// pregunta 14 de 317 primer parcial
+
+Según la taxonomía de Flynn, que clasifica los sistemas de computación basados en la cantidad 
+de flujos de instrucciones y datos que manejan, podemos clasificar OpenMP, MPI y el módulo 
+multiprocessing de Python de la siguiente manera:
+
+OpenMP
+Clasificación: MIMD (Multiple Instruction, Multiple Data)
+
+Justificación: OpenMP permite que múltiples hilos ejecuten diferentes
+instrucciones simultáneamente en diferentes datos. 
+Aunque se utiliza en entornos de memoria compartida, cada hilo puede seguir su propia ruta de ejecución, 
+permitiendo múltiples instrucciones y múltiples datos.
+
+MPI
+Clasificación: MIMD (Multiple Instruction, Multiple Data)
+
+Justificación: MPI permite la comunicación entre múltiples procesos independientes que pueden
+ejecutar diferentes instrucciones en paralelo sobre diferentes datos. 
+Funciona en entornos de memoria distribuida, donde cada proceso tiene su propia memoria local y 
+los datos se distribuyen entre los procesos.
+
+Multiprocessing en Python
+Clasificación: MIMD (Multiple Instruction, Multiple Data)
+
+Justificación: El módulo multiprocessing en Python crea múltiples procesos independientes, 
+cada uno con su propia memoria, que pueden ejecutar diferentes instrucciones en 
+paralelo sobre diferentes datos. Esto permite una verdadera ejecución paralela, similar a MPI, 
+pero generalmente en un entorno de memoria compartida.
+
+
 
