@@ -1,1 +1,63 @@
+# pregunta Nro 10 de 317 primer parcial
 
+# importamos la libreria de multiprocesing 
+
+import multiprocessing
+
+def generar_subserie(inicio, fin):
+    """
+    Genera una sub-serie de números pares comenzando desde 2*(inicio+1) hasta 2*(fin+1).
+    """
+    subserie = [2 * (i + 1) for i in range(inicio, fin)]
+    return subserie
+
+def main():
+    # hacemos la solicitud al usuario el número de términos (N) y el número de procesadores (M)
+    N = int(input("Ingrese el número de términos (N): "))
+    M = int(input("Ingrese el número de procesadores (M): "))
+
+    # calculamos  el tamaño de la sub-serie para cada proceso
+    tamaño_subserie = N // M
+    sobrante = N % M
+
+    # ahora creamos una lista para almacenar los resultados parciales
+    resultados = []
+
+    # crearmos  un pool de procesos
+    with multiprocessing.Pool(processes=M) as pool:
+        # aca asignsmos los rangos a cada proceso
+        inicio = 0
+        for i in range(M):
+            fin = inicio + tamaño_subserie + (1 if i < sobrante else 0)
+            resultados.append(pool.apply_async(generar_subserie, (inicio, fin)))
+            inicio = fin
+
+        # ahora tomamos los resultados
+        serie_completa = []
+        for resultado in resultados:
+            serie_completa.extend(resultado.get())
+
+    # imprimimos la serie completa
+    print("Serie generada:", serie_completa)
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+# ------------ veamos como nos sale ------------
+
+Guarda el código en un archivo, por ejemplo, generar_serie.py.
+Ejecuta el script desde la línea de comandos:
+
+
+python generar_serie.py
+tenemos que ingresar el número de términos (N) y el número de procesadores (M) cuando se te solicite.
+
+
+
+$ python generar_serie.py
+Ingrese el número de términos (N): 20
+Ingrese el número de procesadores (M): 4
+Serie generada: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28,......
