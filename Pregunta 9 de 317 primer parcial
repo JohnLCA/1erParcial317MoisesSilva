@@ -1,1 +1,95 @@
+// pregunta Nro 9 de 317 primer parcial
+
+// importamos MPI para realizar el caculo de la serie 2,4,6,8,10,.... en M vectores para N terminos
+
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+// vemos la función principal
+int main(int argc, char *argv[]) {
+    // hacemos la inicializacion de MPI
+    MPI_Init(&argc, &argv);
+
+    int num_procesos, rango, N, M, i;
+    int *serie = NULL;
+    int *sub_serie = NULL;
+    int tamano_sub_serie;
+
+    // tenemos que obtener el número total de procesos y el rango del proceso actual
+    MPI_Comm_size(MPI_COMM_WORLD, &num_procesos);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rango);
+
+    // realizamos el proceso 0 obtiene el número de términos (N) y el número de procesadores (M)
+    if (rango == 0) {
+        if (argc != 3) {
+            printf("Uso: %s <Número de términos (N)> <Número de procesadores (M)>\n", argv[0]);
+            MPI_Abort(MPI_COMM_WORLD, -1);
+        }
+
+        N = atoi(argv[1]);
+        M = atoi(argv[2]);
+
+        if (M > num_procesos) {
+            printf("Error: El número de procesadores (M) no puede ser mayor que el número total de procesos (%d)\n", num_procesos);
+            MPI_Abort(MPI_COMM_WORLD, -1);
+        }
+        
+        // asignamos la memoria para la serie completa
+        serie = (int *)malloc(N * sizeof(int));
+        if (serie == NULL) {
+            printf("Error al asignar memoria para la serie\n");
+            MPI_Abort(MPI_COMM_WORLD, -1);
+        }
+    }
+
+    // se hace difundir el valor de N a todos los procesos
+    MPI_Bcast(&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(&M, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // entoces caluculamos el tamaño de la sub-serie para cada proceso
+    tamano_sub_serie = N / num_procesos;
+    if (rango < N % num_procesos) {
+        tamano_sub_serie++;
+    }
+
+    // asignamos la memoria para la sub-serie de cada proceso
+    sub_serie = (int *)malloc(tamano_sub_serie * sizeof(int));
+    if (sub_serie == NULL) {
+        printf("Error al asignar memoria para la sub-serie en el proceso %d\n", rango);
+        MPI_Abort(MPI_COMM_WORLD, -1);
+    }
+
+    // calculamos los índices de inicio y fin para cada proceso
+    int inicio = rango * (N / num_procesos) + (rango < N % num_procesos ? rango : N % num_procesos);
+    int fin = inicio + tamano_sub_serie;
+
+    // entonces generamos la sub-serie para cada proceso
+    for (i = inicio; i < fin; i++) {
+        sub_serie[i - inicio] = 2 * (i + 1);
+    }
+
+    // reunimos las sub-series en el proceso 0
+    MPI_Gather(sub_serie, tamano_sub_serie, MPI_INT, serie, tamano_sub_serie, MPI_INT, 0, MPI_COMM_WORLD);
+
+    // vemos el proceso 0 imprime la serie completa
+    if (rango == 0) {
+        printf("Serie generada: ");
+        for (i = 0; i < N; i++) {
+            printf("%d ", serie[i]);
+        }
+        printf("\n");
+
+        // liberamos la memoria asignada
+        free(serie);
+    }
+
+    // aca igual liberamos la memoria asignada para la sub-serie
+    free(sub_serie);
+
+    // ponemos fin a MPI
+    MPI_Finalize();
+
+    return 0;
+}
 
